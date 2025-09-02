@@ -10,6 +10,9 @@ export default function LoginPage() {
   const handleLogin = () => {
     // Add your authentication logic here
     // On success, navigate to the main tabs
+
+    //router.replace() makes it so that the current page is gone from the stack and the new page renders
+    //router.push() adds a new page to the stack, letting users go back. Useful for small menus
     router.replace('/(tabs)');
   };
 
