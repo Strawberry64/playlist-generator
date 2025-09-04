@@ -22,6 +22,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <h1>HELLO </h1>
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
