@@ -5,8 +5,10 @@ import * as AuthSession from "expo-auth-session";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CLIENT_ID = "b1583baae9cd4a8d9bbb02795d833985";
-const CLIENT_SECRET = '4a668f78ea6d4fd18fc9db8e138cfe07';
+
+const CLIENT_ID = process.env.EXPO_PUBLIC_CLIENT_ID;
+const CLIENT_SECRET = process.env.EXPO_PUBLIC_CLIENT_SECRET;
+
 const SCOPES = [
   "user-read-private", "user-read-email",
   "user-library-modify", "user-library-read",
@@ -22,6 +24,7 @@ const discovery = {
 const redirectUri = AuthSession.makeRedirectUri({
   scheme: "myapp"
 });
+
 const TOKENS_KEY = "spotify_tokens";
 
 export default function LoginScreen() {
