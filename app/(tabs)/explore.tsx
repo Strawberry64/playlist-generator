@@ -7,6 +7,9 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Button } from 'react-native';
+import { useRouter } from 'expo-router';
+const router = useRouter();
 
 export default function TabTwoScreen() {
   return (
@@ -20,6 +23,13 @@ export default function TabTwoScreen() {
           style={styles.headerImage}
         />
       }>
+
+        const router = useRouter();
+
+        <Button
+          title="Go to Playlists"
+          onPress={() => router.push('/playlists')}
+        />
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
