@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { StyleSheet, Button, View  } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 
 import { HelloWave } from '@/components/HelloWave';
@@ -10,43 +11,75 @@ import { ThemedView } from '@/components/ThemedView';
 export default function HomeScreen() {
   const router = useRouter();
   return (
-   <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Playlist Generator</ThemedText>
-      </ThemedView>
+    <LinearGradient
+      colors={['#1DB954', '#121212']} // Spotify green fading into dark
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.container}
+    >
+      {/* Spotify Logo
+      <Image
+        source={require('@/assets/images/spotify-logo.png')} // make sure logo is in assets
+        style={styles.logo}
+        contentFit="contain"
+      />*/}
 
-      {/* Buttons Section */}
-      <View style={styles.buttonContainer}>
-        <Button title="Login" onPress={() => router.push('/login')} />
-        <Button title="Sign Up" onPress={() => router.push('/signup')} />
-      </View>
-    </ParallaxScrollView>
+      {/* Title */}
+      <Text style={styles.title}>Playlist Generator</Text>
+      <Text style={styles.subtitle}>
+        Create personalized playlists powered by Spotify
+      </Text>
+
+      {/* Buttons */}
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={() => router.push('/login')}
+      >
+        <Text style={styles.loginButtonText}>Log in with Spotify</Text>
+      </TouchableOpacity>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+   container: {
+    flex: 1,
     alignItems: 'center',
-    gap: 8,
-  },
-  buttonContainer: {
-    gap: 16,
-    marginTop: 40,
+    justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#E0E0E0',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  loginButton: {
+    backgroundColor: '#1DB954', // Spotify green
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    elevation: 3, // subtle shadow on Android
+    shadowColor: '#000', // subtle shadow on iOS
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
