@@ -1,12 +1,14 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform } from 'react-native';
+
+<FontAwesome5 name="database" size={24} color="black" />
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -41,19 +43,21 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Settings"
+        name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Database Stuff"
+        name="db_test"
         options={{
           title: 'Database',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="gearshape.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="database" size={28} color={color} />
+          ),
         }}
-      />
+/>
     </Tabs>
   );
 }
