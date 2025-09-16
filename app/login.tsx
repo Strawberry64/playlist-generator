@@ -24,20 +24,21 @@ const discovery = {
 const redirectUri = AuthSession.makeRedirectUri({
   scheme: "myapp"
 });
-
+console.log("Redirect URI:", redirectUri);
 const TOKENS_KEY = "spotify_tokens";
 
 export default function LoginScreen() {
   //iniciating tokens
-  const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState(null);
 
   //this a hook and makes request to spotify for authorization
   //returns (code)
   const [request, response, promptAsync] = useAuthRequest({
     responseType: ResponseType.Code,
-    clientId: CLIENT_ID,
+    clientId: CLIENT_ID || '',
     scopes: SCOPES,
     usePKCE: false,
     redirectUri: redirectUri,
@@ -52,21 +53,24 @@ export default function LoginScreen() {
   };
 
   // function to exchange (code) from authorization to access token
-  const exchangeCodeForToken = async (code) => {
+  const exchangeCodeForToken = async (code: string) => {
     try {
       setIsLoading(true);
+
+      const data = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: CLIENT_ID || '',
+        client_secret: CLIENT_SECRET || '',
+      });
+      
       const response = await fetch(discovery.tokenEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: redirectUri,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-        }).toString(),
+        body:(data).toString(),
       });
       const tokenData = await response.json();
       
@@ -142,7 +146,7 @@ export default function LoginScreen() {
         <View>
           <Text>Successfully Authenticated!</Text>
           <Text>
-            Token: {accessToken.substring(0, 30)}
+            Token: {accessToken}... (truncated)
           </Text>
           <TouchableOpacity onPress={accountPage}>
             <Text>Account page</Text>
