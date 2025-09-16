@@ -25,6 +25,8 @@ const redirectUri = AuthSession.makeRedirectUri({
   scheme: "myapp"
 });
 
+console.log("Redirect URI:", redirectUri);
+
 const TOKENS_KEY = "spotify_tokens";
 
 export default function LoginScreen() {
