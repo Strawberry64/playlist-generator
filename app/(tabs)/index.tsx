@@ -11,33 +11,9 @@ import { ThemedView } from '@/components/ThemedView';
 export default function HomeScreen() {
   const router = useRouter();
   return (
-    <LinearGradient
-      colors={['#1DB954', '#121212']} // Spotify green fading into dark
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.container}
-    >
-      {/* Spotify Logo
-      <Image
-        source={require('@/assets/images/spotify-logo.png')} // make sure logo is in assets
-        style={styles.logo}
-        contentFit="contain"
-      />*/}
-
-      {/* Title */}
-      <Text style={styles.title}>Playlist Generator</Text>
-      <Text style={styles.subtitle}>
-        Create personalized playlists powered by Spotify
-      </Text>
-
-      {/* Buttons */}
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => router.push('/login')}
-      >
-        <Text style={styles.loginButtonText}>Log in with Spotify</Text>
-      </TouchableOpacity>
-    </LinearGradient>
+    <View style={styles.container}>
+      <Text>Construction Area, check in next time!</Text>
+    </View>
   );
 }
 
