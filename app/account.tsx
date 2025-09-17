@@ -4,9 +4,10 @@ import * as AuthSession from "expo-auth-session";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 export default function AccountScreen() {
-    const [user,setUser] = useState([]);
-    const [playlists, setplaylists] = useState([]);
+    const [user, setUser] = useState<any>(null);
+    const [playlists, setPlaylists] = useState<any[]>([]);
     const loadDetails = async () => {
         const access_token = await AsyncStorage.getItem('access_token');
         const currUri = 'https://api.spotify.com/v1/me';
@@ -33,8 +34,10 @@ export default function AccountScreen() {
                 }
             })
             const data = await body.json();
-            setplaylists(data)
-            
+            setPlaylists(data)
+
+            console.log(data)
+          
         }catch{
             console.log('yo playlists no work')
         }
@@ -50,20 +53,25 @@ export default function AccountScreen() {
     return(
         <View>
             <Text>your acount page</Text>
-            <Text>Profile name: {user.display_name} </Text>
-            <Text>Email: {user.email}</Text>
-            <Text>Region: {user.country}</Text>
+            <Text>Profile name: {user?.display_name} </Text>
+            <Text>Email: {user?.email}</Text>
+            <Text>Region: {user?.country}</Text>
 
 
             <Text>PLAYLISTS</Text>
             <FlatList
-                data={playlists.items}
+                data={playlists?.items}
                 renderItem={({ item }) => (
                     <TouchableOpacity>
                         <Text>{item.name}</Text>
-                        <Image source={{uri: item.images[0].url}}
-                            style={{ width: 150, height: 150, borderRadius: 10 }}></Image>
-                        <Text></Text>
+                        {item?.images?.[0]?.url ? (
+                            <Image
+                                source={{ uri: item.images[0].url }}
+                                style={{ width: 150, height: 150, borderRadius: 10 }}
+                            />
+                        ) : (
+                            <Text>No image available</Text>
+                        )}
                     </TouchableOpacity>
                 )}
                 />

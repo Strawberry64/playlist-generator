@@ -30,6 +30,10 @@ export default function TabTwoScreen() {
           title="Go to Playlists"
           onPress={() => router.push('/playlists')}
         />
+        <Button
+        title='Go to generate'
+        onPress={() => router.push('/generate')}
+        />
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>

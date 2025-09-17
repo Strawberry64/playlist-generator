@@ -22,7 +22,7 @@ const discovery = {
 };
 
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: "myapp"
+  scheme: "playlistgenerator"
 });
 
 const TOKENS_KEY = "spotify_tokens";
@@ -40,7 +40,7 @@ export default function LoginScreen() {
     clientId: CLIENT_ID,
     scopes: SCOPES,
     usePKCE: false,
-    redirectUri: redirectUri,
+    redirectUri,
   }, discovery);
    
   // Starts the auth flow
@@ -52,7 +52,7 @@ export default function LoginScreen() {
   };
 
   // function to exchange (code) from authorization to access token
-  const exchangeCodeForToken = async (code) => {
+  const exchangeCodeForToken = async () => {
     try {
       setIsLoading(true);
       const response = await fetch(discovery.tokenEndpoint, {
@@ -62,7 +62,7 @@ export default function LoginScreen() {
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
-          code: code,
+          code: await AsyncStorage.getItem('account_code'),
           redirect_uri: redirectUri,
           client_id: CLIENT_ID,
           client_secret: CLIENT_SECRET,
@@ -96,6 +96,7 @@ export default function LoginScreen() {
    // Function to start authentication
   useEffect(() => {
     if (!accessToken && request && !isLoading) {
+      
       console.log('Auto-starting authentication...');
       startAuth();
     }
@@ -105,9 +106,10 @@ export default function LoginScreen() {
   useEffect(() => {
     const handleAuthResponse = async () => {
       if (response?.type === 'success') {
-        const { code } = response.params;
+        await AsyncStorage.setItem('account_code', response.params.code);
         console.log('Authorization code received');
-        await exchangeCodeForToken(code);
+        await exchangeCodeForToken();
+        router.replace("/account");
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);
@@ -142,11 +144,8 @@ export default function LoginScreen() {
         <View>
           <Text>Successfully Authenticated!</Text>
           <Text>
-            Token: {accessToken.substring(0, 30)}
+            Token: {accessToken}
           </Text>
-          <TouchableOpacity onPress={accountPage}>
-            <Text>Account page</Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={logout}>
             <Text>logout</Text>
           </TouchableOpacity>
