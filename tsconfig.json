@@ -3,12 +3,11 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "types": ["jest", "node"],
+    "jsx": "react-jsx"
   },
-  
   "include": [
     "**/*.ts",
     "**/*.tsx",

@@ -26,6 +26,7 @@ const redirectUri = AuthSession.makeRedirectUri({
 });
 console.log("Redirect URI:", redirectUri);
 const TOKENS_KEY = "spotify_tokens";
+console.log(redirectUri)
 
 export default function LoginScreen() {
   //iniciating tokens
@@ -112,7 +113,7 @@ export default function LoginScreen() {
         const { code } = response.params;
         console.log('Authorization code received');
         await exchangeCodeForToken(code);
-        router.replace("/account");
+        router.replace("/(tabs)")
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);

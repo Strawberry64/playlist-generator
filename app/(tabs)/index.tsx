@@ -7,37 +7,59 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [user,setUser] = useState([]);
+    const [playlists, setplaylists] = useState([]);
+    const loadDetails = async () => {
+        const access_token = await AsyncStorage.getItem('access_token');
+        const currUri = 'https://api.spotify.com/v1/me';
+        try{
+            const body = await fetch(currUri, {
+                headers:{
+                    Authorization: `Bearer ${access_token}`
+                }
+            })
+            const data = await body.json();
+            setUser(data)
+            console.log(data)
+        }catch{
+            console.log('yo code no work');
+        }
+        
+    }
+    const loadPlaylists = async () => {
+        const access_token = await AsyncStorage.getItem('access_token');
+        const uri = 'https://api.spotify.com/v1/me/playlists'
+        try{
+            const body = await fetch(uri, {
+                headers:{
+                    Authorization: `Bearer ${access_token}`
+                }
+            })
+            const data = await body.json();
+            setplaylists(data)
+            console.log(data)
+            
+        }catch{
+            console.log('yo playlists no work')
+        }
+
+    }
+
+    useEffect(() =>{
+        loadDetails()
+        loadPlaylists()
+    },[]);
   return (
-    <LinearGradient
-      colors={['#1DB954', '#121212']} // Spotify green fading into dark
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.container}
-    >
-      {/* Spotify Logo
-      <Image
-        source={require('@/assets/images/spotify-logo.png')} // make sure logo is in assets
-        style={styles.logo}
-        contentFit="contain"
-      />*/}
-
-      {/* Title */}
-      <Text style={styles.title}>Playlist Generator</Text>
-      <Text style={styles.subtitle}>
-        Create personalized playlists powered by Spotify
-      </Text>
-
-      {/* Buttons */}
-      <TouchableOpacity
-        style={styles.loginButton}
-        onPress={() => router.push('/login')}
-      >
-        <Text style={styles.loginButtonText}>Log in with Spotify</Text>
-      </TouchableOpacity>
-    </LinearGradient>
+    <View style={styles.container}>
+      <Text>Construction Area, check in next time!</Text>
+    </View>
   );
 }
 
