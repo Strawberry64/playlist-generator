@@ -112,6 +112,7 @@ export default function LoginScreen() {
         const { code } = response.params;
         console.log('Authorization code received');
         await exchangeCodeForToken(code);
+        router.replace("/account");
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);
@@ -128,9 +129,9 @@ export default function LoginScreen() {
   };
 
   //funtion to redirect to account page
-  const accountPage = () => {
-    router.replace("/account");
-  }
+  // const accountPage = () => {
+  //   router.replace("/account");
+  // }
 
   return (
     <View>
@@ -148,9 +149,9 @@ export default function LoginScreen() {
           <Text>
             Token: {accessToken}... (truncated)
           </Text>
-          <TouchableOpacity onPress={accountPage}>
+          {/* <TouchableOpacity onPress={accountPage}>
             <Text>Account page</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity onPress={logout}>
             <Text>logout</Text>
           </TouchableOpacity>
