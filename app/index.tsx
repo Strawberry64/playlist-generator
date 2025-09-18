@@ -48,7 +48,7 @@ export default function HomeScreen() {
   //returns (code)
   const [request, response, promptAsync] = useAuthRequest({
     responseType: ResponseType.Code,
-    clientId: CLIENT_ID,
+    clientId: CLIENT_ID || "",
     scopes: SCOPES,
     usePKCE: false,
     redirectUri: redirectUri,
@@ -63,21 +63,22 @@ export default function HomeScreen() {
   };
 
   // function to exchange (code) from authorization to access token
-  const exchangeCodeForToken = async (code) => {
+  const exchangeCodeForToken = async (code:string) => {
     try {
       setIsLoading(true);
+      const data = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: CLIENT_ID || '',
+        client_secret: CLIENT_SECRET || '',
+      });
       const response = await fetch(discovery.tokenEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: redirectUri,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-        }).toString(),
+        body:(data).toString(),
       });
       const tokenData = await response.json();
       

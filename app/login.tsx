@@ -132,9 +132,9 @@ export default function LoginScreen() {
   };
 
   //funtion to redirect to account page
-  const accountPage = () => {
-    router.replace("/account");
-  }
+  // const accountPage = () => {
+  //   router.replace("/account");
+  // }
 
   return (
     <View>

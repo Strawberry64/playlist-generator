@@ -7,9 +7,55 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [user,setUser] = useState([]);
+    const [playlists, setplaylists] = useState([]);
+    const loadDetails = async () => {
+        const access_token = await AsyncStorage.getItem('access_token');
+        const currUri = 'https://api.spotify.com/v1/me';
+        try{
+            const body = await fetch(currUri, {
+                headers:{
+                    Authorization: `Bearer ${access_token}`
+                }
+            })
+            const data = await body.json();
+            setUser(data)
+            console.log(data)
+        }catch{
+            console.log('yo code no work');
+        }
+        
+    }
+    const loadPlaylists = async () => {
+        const access_token = await AsyncStorage.getItem('access_token');
+        const uri = 'https://api.spotify.com/v1/me/playlists'
+        try{
+            const body = await fetch(uri, {
+                headers:{
+                    Authorization: `Bearer ${access_token}`
+                }
+            })
+            const data = await body.json();
+            setplaylists(data)
+            console.log(data)
+            
+        }catch{
+            console.log('yo playlists no work')
+        }
+
+    }
+
+    useEffect(() =>{
+        loadDetails()
+        loadPlaylists()
+    },[]);
   return (
     <View style={styles.container}>
       <Text>Construction Area, check in next time!</Text>

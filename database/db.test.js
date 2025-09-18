@@ -28,7 +28,7 @@ describe("Database functions (async SQLite)", () => {
 
   test("createOrGetPlaylistId should return a number", async () => {
     const pid = await createOrGetPlaylistId("MyPlaylist");
-    expect(typeof pid).toBe("number");
+    expect(typeof pid).toBe("text");
   });
 
   test("addSongToPlaylist should resolve truthy", async () => {
