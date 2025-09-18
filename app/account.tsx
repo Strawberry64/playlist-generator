@@ -17,7 +17,9 @@ type Playlist = {
   images: SpotifyImage[];
 };
 
+
 export default function AccountScreen() {
+
   const [user, setUser] = useState<User | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -67,11 +69,11 @@ export default function AccountScreen() {
       setPlaylists(Array.isArray(data.items) ? data.items : []);
       let count = 0;
       for (const playlist of data.items ) {
-
           console.log(JSON.stringify(playlist, null, 2));
           //console.log("PLAYLIST Tracks total: ",playlist.tracks?.total || 0);
           await createOrGetPlaylistId(playlist.id ,playlist.name,playlist.tracks?.total || 0);
           // console.log("Fetching tracks for playlist:", playlist.name);
+
 
           const tracks = await getAllTracksFromPlaylist(playlist.id);
           // this is only for getting the first 5 playlists for demo purposes
@@ -92,7 +94,6 @@ export default function AccountScreen() {
           console.log(`Fetched '${tracks}' tracks for playlist:`, playlist.name);
           count++;
       }
-
     } catch (e: any) {
       setError(`Playlists fetch failed: ${e.message}`);
     }
