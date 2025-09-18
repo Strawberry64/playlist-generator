@@ -35,7 +35,7 @@ describe("DatabaseScreen Component", () => {
     fireEvent.press(getByText("Add Song"));
 
     await waitFor(() => {
-      expect(db.createSong).toHaveBeenCalledWith("Test Song", "Test Artist");
+      expect(db.addSong).toHaveBeenCalledWith("Test Song", "Test Artist");
     });
   });
 
