@@ -77,8 +77,6 @@ async function addSongToPlaylist(playlistId,songId ) {
 }
 
 
-
-
  async function getAllSongs() {
   await initDb();
   return db.getAllAsync(`SELECT * FROM songs;`);
