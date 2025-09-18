@@ -12,17 +12,31 @@ export default function GeneratePage(){
     const [isCreating, setIsCreating] = useState(false);
     const [name, setName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [tracks, setTrack] = useState<string[]>([]);
+    const [track, setTrack] = useState<string>("");
+    const [tracks, setTracks] = useState<string[]>([]);
     const [artists, setArtists] = useState<string[]>([]);
     const [genre, setGenre] = useState<string[]>([]);
     const [value, setValue] = React.useState<string>('java');
+    
 
-    const genParams = async () => {
+    const genParams = async (
+        userInput: string
+    ) => {
+        const access_token = await AsyncStorage.getItem('access_token');
+
         try{
-            const Uri = 'https://api.spotify.com/v1/search?'
+            const input = userInput
+            const query = `remaster track:${input}`
+            const encoded = encodeURIComponent(query)
+
+            const Uri = `https://api.spotify.com/v1/search?q=${encoded}&type=track&limit=5&offset=1`
             const res = await fetch(Uri, {
-                
+                headers: {
+                    Authorization: `Bearer ${access_token}`
+                }
             })
+            const data = await res.json();
+            console.log(data.tracks.items[4].name)
         }catch{
             console.log('fix yo shiiii')
         }
@@ -39,7 +53,7 @@ export default function GeneratePage(){
     if (isCreating) return; 
     setIsCreating(true);
     try {
-        const access_token = await AsyncStorage.getItem('access_token');; // ensures token + me loaded
+        const access_token = await AsyncStorage.getItem('access_token');
 
         const Uri = 'https://api.spotify.com/v1/me/playlists';
         const res = await fetch(Uri, {
@@ -78,17 +92,15 @@ export default function GeneratePage(){
                 onChangeText={setDescription}
             />
 
-            {/* <Text style={{ marginBottom: 8 }}>Language</Text>
-            <Picker
-                selectedValue={value}
-                onValueChange={setValue}
-                style={{ backgroundColor: '#fff' }}
-            >
-                <Picker.Item label="Java" value="java" />
-                <Picker.Item label="JavaScript" value="js" />
-                <Picker.Item label="Python" value="py" />
-            </Picker>
-             */}
+            <Text>Search Track</Text>
+            <TextInput
+                placeholder="Track.."
+                value={track}
+                onChangeText={setTrack}></TextInput>
+            <Button 
+            title="try out search"
+            onPress={() => genParams(track)}></Button>
+            
             <Button 
             title={isCreating ? "Creating..." : "Create Plalist"} 
             onPress={() => generate(name, description)}/>
