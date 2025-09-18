@@ -22,7 +22,7 @@ const discovery = {
 };
 
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: "myapp"
+  scheme: "playlistgenerator"
 });
 console.log("Redirect URI:", redirectUri);
 const TOKENS_KEY = "spotify_tokens";
@@ -42,7 +42,7 @@ export default function LoginScreen() {
     clientId: CLIENT_ID || '',
     scopes: SCOPES,
     usePKCE: false,
-    redirectUri: redirectUri,
+    redirectUri,
   }, discovery);
    
   // Starts the auth flow
@@ -54,6 +54,7 @@ export default function LoginScreen() {
   };
 
   // function to exchange (code) from authorization to access token
+
   const exchangeCodeForToken = async (code: string) => {
     try {
       setIsLoading(true);
@@ -101,6 +102,7 @@ export default function LoginScreen() {
    // Function to start authentication
   useEffect(() => {
     if (!accessToken && request && !isLoading) {
+      
       console.log('Auto-starting authentication...');
       startAuth();
     }
@@ -150,9 +152,6 @@ export default function LoginScreen() {
           <Text>
             Token: {accessToken}... (truncated)
           </Text>
-          {/* <TouchableOpacity onPress={accountPage}>
-            <Text>Account page</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity onPress={logout}>
             <Text>logout</Text>
           </TouchableOpacity>

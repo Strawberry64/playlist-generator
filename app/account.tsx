@@ -17,7 +17,9 @@ type Playlist = {
   images: SpotifyImage[];
 };
 
+
 export default function AccountScreen() {
+
   const [user, setUser] = useState<User | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,6 @@ export default function AccountScreen() {
         console.log(`Fetched '${tracks}' tracks for playlist:`, playlist.name);
         count++;
       }
-
     } catch (e: any) {
       setError(`Playlists fetch failed: ${e.message}`);
     }
