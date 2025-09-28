@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { addSongToPlaylist, retrieve, createOrGetPlaylistId, createSong } from '../../database/db.js';
+import { addSongToPlaylist, getAllSongs,getAllPlaylists, createOrGetPlaylistId, addSong,initDb } from '../../database/db.js';
 
 
 export default function DatabaseScreen() {
@@ -29,73 +29,31 @@ export default function DatabaseScreen() {
 
       <ThemedView>
 
-        <TextInput
-          placeholder="Enter your playlist name"
-          value={playlistName}
-          onChangeText={setplaylistName}
-          style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            padding: 8,
-            marginVertical: 10,
-          }}
-        />
-
-        <TextInput
-          placeholder="Enter your song name"
-          value={song}
-          onChangeText={setSongName}
-          style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            padding: 8,
-            marginVertical: 10,
-          }}
-        />
-
-        <TextInput
-          placeholder="Enter your artist name"
-          value={artist}
-          onChangeText={setArtistName}
-          style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            padding: 8,
-            marginVertical: 10,
-          }}
-        />
-
-
         <Button
           onPress={async () => {
-            await createSong(song, artist);
-            await retrieve();
+            // await createSong(song, artist);
+            await initDb();
+
+            console.log('SONGS: ',await getAllSongs());
           }}
-          title="Add Song"
+          title="Get Song"
         />
 
         <View style={{ marginVertical: 6 }} />
 
         <Button
           onPress={async () => {
-            await createOrGetPlaylistId(playlistName); 
-            await retrieve();
+            // await createOrGetPlaylistId(playlistName); 
+            await initDb();
+
+            console.log("Playlist:",await getAllPlaylists());
           }}
-          title="Add Playlist"
+          title="Get Playlist"
         />
 
         <View style={{ marginVertical: 6 }} />
 
-        <Button
-          onPress={async () => {
-            const pid = await createOrGetPlaylistId(playlistName); 
-            if (pid) {
-              await addSongToPlaylist(pid, song, artist);          
-              await retrieve();
-            }
-          }}
-          title="Add Song to playlist"
-        />
+
 
 
       </ThemedView>

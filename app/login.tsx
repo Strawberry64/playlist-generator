@@ -22,26 +22,27 @@ const discovery = {
 };
 
 const redirectUri = AuthSession.makeRedirectUri({
-  scheme: "myapp"
+  scheme: "playlistgenerator"
 });
-
+console.log("Redirect URI:", redirectUri);
 const TOKENS_KEY = "spotify_tokens";
 console.log(redirectUri)
 
 export default function LoginScreen() {
   //iniciating tokens
-  const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState(null);
 
   //this a hook and makes request to spotify for authorization
   //returns (code)
   const [request, response, promptAsync] = useAuthRequest({
     responseType: ResponseType.Code,
-    clientId: CLIENT_ID,
+    clientId: CLIENT_ID || '',
     scopes: SCOPES,
     usePKCE: false,
-    redirectUri: redirectUri,
+    redirectUri,
   }, discovery);
    
   // Starts the auth flow
@@ -53,21 +54,25 @@ export default function LoginScreen() {
   };
 
   // function to exchange (code) from authorization to access token
-  const exchangeCodeForToken = async (code) => {
+
+  const exchangeCodeForToken = async (code: string) => {
     try {
       setIsLoading(true);
+
+      const data = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: CLIENT_ID || '',
+        client_secret: CLIENT_SECRET || '',
+      });
+      
       const response = await fetch(discovery.tokenEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: redirectUri,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-        }).toString(),
+        body:(data).toString(),
       });
       const tokenData = await response.json();
       
@@ -97,6 +102,7 @@ export default function LoginScreen() {
    // Function to start authentication
   useEffect(() => {
     if (!accessToken && request && !isLoading) {
+      
       console.log('Auto-starting authentication...');
       startAuth();
     }
@@ -109,6 +115,7 @@ export default function LoginScreen() {
         const { code } = response.params;
         console.log('Authorization code received');
         await exchangeCodeForToken(code);
+        router.replace("/(tabs)")
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);
@@ -125,9 +132,9 @@ export default function LoginScreen() {
   };
 
   //funtion to redirect to account page
-  const accountPage = () => {
-    router.replace("/account");
-  }
+  // const accountPage = () => {
+  //   router.replace("/account");
+  // }
 
   return (
     <View>
@@ -143,11 +150,8 @@ export default function LoginScreen() {
         <View>
           <Text>Successfully Authenticated!</Text>
           <Text>
-            Token: {accessToken.substring(0, 30)}
+            Token: {accessToken}... (truncated)
           </Text>
-          <TouchableOpacity onPress={accountPage}>
-            <Text>Account page</Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={logout}>
             <Text>logout</Text>
           </TouchableOpacity>
