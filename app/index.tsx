@@ -1,19 +1,18 @@
 // import { Image } from 'expo-image';
-import { StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import { Text, View, TouchableOpacity, FlatList, Image} from "react-native";
-import { ResponseType, useAuthRequest, makeRedirectUri } from "expo-auth-session";
-import * as AuthSession from "expo-auth-session";
-import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as AuthSession from "expo-auth-session";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
+import { addSong, addSongToPlaylist, createOrGetPlaylistId, initDb } from '../database/db.js';
+
+// Initialize database
+initDb();
 
 const CLIENT_ID = process.env.EXPO_PUBLIC_CLIENT_ID;
 const CLIENT_SECRET = process.env.EXPO_PUBLIC_CLIENT_SECRET;
@@ -43,6 +42,9 @@ export default function HomeScreen() {
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
+  const [dataLoading, setDataLoading] = useState(false);
 
   //this a hook and makes request to spotify for authorization
   //returns (code)
@@ -105,31 +107,147 @@ export default function HomeScreen() {
     }
   };
 
-  //  // Function to start authentication
-  // useEffect(() => {
-  //   if (!accessToken && request && !isLoading) {
-  //     console.log('Auto-starting authentication...');
-  //     startAuth();
-  //   }
-  // }, [request, accessToken]);
+  // Helper function to get token from storage
+  const getToken = async () => {
+    const token = await AsyncStorage.getItem("access_token");
+    if (!token) throw new Error("No access_token in storage");
+    return token;
+  };
+
+  // Helper function to make authenticated API requests
+  const fetchJson = async (url: string, token: string) => {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    let data: any = {};
+    try {
+      data = await res.json();
+    } catch (_) { }
+    if (!res.ok) {
+      const msg = data?.error?.message ||
+        `${res.status} ${res.statusText || "Request failed"}`;
+      throw new Error(msg);
+    }
+    return data;
+  };
+
+  // Load user details from Spotify
+  const loadDetails = async () => {
+    try {
+      const token = await getToken();
+      const data = await fetchJson("https://api.spotify.com/v1/me", token);
+      setUser(data);
+      console.log("User data loaded:", data.display_name);
+    } catch (e: any) {
+      console.error(`User fetch failed: ${e.message}`);
+      throw e;
+    }
+  };
+
+  // Get all tracks from a specific playlist
+  const getAllTracksFromPlaylist = async (playlistId: string) => {
+    const token = await getToken();
+    const items: any[] = [];
+    let url: string | null =
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
+
+    while (url) {
+      const page = await fetchJson(url, token);
+      if (Array.isArray(page.items)) {
+        items.push(...page.items);
+        url = page?.next || null;
+      }
+    }
+    return items
+      .map((it) => it.track)
+      .filter((t) => t && t.type === "track" && t.id)
+      .map((t) => ({
+        id: t.id,
+        name: t.name,
+        artist: t?.artists?.[0]?.name ?? "Unknown",
+      }));
+  };
+
+  // Load playlists and populate database
+  const loadPlaylists = async () => {
+    setDataLoading(true);
+    try {
+      const token = await getToken();
+      // Start with first page
+      const data = await fetchJson(
+        "https://api.spotify.com/v1/me/playlists?limit=50",
+        token
+      );
+
+      setPlaylists(Array.isArray(data.items) ? data.items : []);
+      
+      let count = 0;
+      for (const playlist of data.items) {
+        
+        // Create or get playlist in the database
+        await createOrGetPlaylistId(playlist.id, playlist.name, playlist.tracks?.total || 0);
+
+        
+        // Get tracks from the playlist
+        const tracks = await getAllTracksFromPlaylist(playlist.id);
+
+        
+        // Limit to first 5 playlists for demo purposes
+        if (count >= 5) {
+          break;
+        }
+        
+        if (playlist.tracks.total > 0) {
+          for (const track of tracks) {
+            // Add song to songs table, and then add to playlist_songs table
+            await addSong(track.id, track.name, track.artist);
+            await addSongToPlaylist(playlist.id, track.id);
+          }
+        }
+      
+        count++;
+      }
+      
+    } catch (e: any) {
+      throw e;
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
+  // Complete data loading process
+  const loadAllData = async () => {
+    try {
+      await loadDetails();
+      await loadPlaylists();
+    } catch (error) {
+      // Continue to tabs even if data loading fails
+    } finally {
+      router.replace("/(tabs)");
+    }
+  };
+
 
   // Handle authentication response
   useEffect(() => {
     const handleAuthResponse = async () => {
       if (response?.type === 'success') {
         const { code } = response.params;
-        console.log('Authorization code received');
-        await exchangeCodeForToken(code);
-        router.replace("/(tabs)")
+
+        try {
+          await exchangeCodeForToken(code);
+          // Start data loading process after successful token exchange
+          await loadAllData();
+        } catch (error) {
+          // Navigate to tabs even if data loading fails
+          router.replace("/(tabs)");
+        }
       } else if (response?.type === 'error') {
-        console.error('Authorization error:', response.error);
         setIsLoading(false);
       }
     };
     handleAuthResponse();
-  }, [response]);  
-
-
+  }, [response]);
 
   
   const router = useRouter();
@@ -155,10 +273,13 @@ export default function HomeScreen() {
 
       {/* Buttons */}
       <TouchableOpacity
-        style={styles.loginButton}
+        style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
         onPress={startAuth}
+        disabled={isLoading}
       >
-        <Text style={styles.loginButtonText}>Log in with Spotify</Text>
+        <Text style={styles.loginButtonText}>
+          {isLoading ? 'Authenticating...' : 'Log in with Spotify'}
+        </Text>
       </TouchableOpacity>
     </LinearGradient>
   );
@@ -199,6 +320,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
+  },
+  loginButtonDisabled: {
+    backgroundColor: '#888',
+    opacity: 0.6,
   },
   loginButtonText: {
     color: '#fff',

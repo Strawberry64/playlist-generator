@@ -115,7 +115,7 @@ export default function LoginScreen() {
         const { code } = response.params;
         console.log('Authorization code received');
         await exchangeCodeForToken(code);
-        router.replace("/(tabs)")
+        router.replace("/account")
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);
