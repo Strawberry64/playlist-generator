@@ -86,4 +86,14 @@ async function addSongToPlaylist(playlistId,songId ) {
   return db.getAllAsync(`SELECT * FROM playlists;`);
 }
 
-export { addSongToPlaylist, addSong, getAllPlaylists,getAllSongs, createOrGetPlaylistId };
+async function getSongsForPlaylist(playlistId) {
+  await initDb();
+  return db.getAllAsync(`
+    SELECT s.id, s.name, s.artist 
+    FROM songs s 
+    JOIN playlist_songs ps ON s.id = ps.song_id 
+    WHERE ps.playlist_id = ?
+  `, playlistId);
+}
+
+export { addSong, addSongToPlaylist, createOrGetPlaylistId, getAllPlaylists, getAllSongs, getSongsForPlaylist };
