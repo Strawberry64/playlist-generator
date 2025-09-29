@@ -1,34 +1,33 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Text, View, ActivityIndicator, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient"; 
 import { addSong, addSongToPlaylist, createOrGetPlaylistId, initDb } from '../database/db.js';
+import { getAccessToken } from "../lib/auth.js";
 
-initDb();
 type User = {
   display_name?: string;
   email?: string;
   country?: string;
 };
 
-type SpotifyImage = { url: string; height?: number; width?: number };
+type SpotifyImage = {
+  url: string;
+  height?: number;
+  width?: number
+};
+
 type Playlist = {
   id: string;
   name: string;
   images: SpotifyImage[];
 };
 
-
 export default function AccountScreen() {
-
   const [user, setUser] = useState<User | null>(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const getToken = async () => {
-    const token = await AsyncStorage.getItem("access_token");
-    if (!token) throw new Error("No access_token in storage");
-    return token;
-  };
+  const [loading, setLoading] = useState(true); 
 
   const fetchJson = async (url: string, token: string) => {
     const res = await fetch(url, {
@@ -48,20 +47,19 @@ export default function AccountScreen() {
 
   const loadDetails = async () => {
     try {
-      const token = await getToken();
+      const token = await getAccessToken();
+      if (!token) throw new Error("No access token found");
       const data = await fetchJson("https://api.spotify.com/v1/me", token);
       setUser(data);
-      //see whats going on with the data
-      console.log("Actual Data:", data);
     } catch (e: any) {
       setError(`User fetch failed: ${e.message}`);
     }
   };
-  // this is the part that after loadings a playlist it will add it to playlist tables then to songs table
+// this is the part that after loadings a playlist it will add it to playlist tables then to songs table
   const loadPlaylists = async () => {
     try {
-      const token = await getToken();
-      // Start with first page
+      const token = await getAccessToken();
+      if (!token) throw new Error("No access token found");
       const data = await fetchJson(
         "https://api.spotify.com/v1/me/playlists?limit=50",
         token
@@ -69,28 +67,23 @@ export default function AccountScreen() {
       setPlaylists(Array.isArray(data.items) ? data.items : []);
       let count = 0;
       for (const playlist of data.items) {
-
-        console.log(JSON.stringify(playlist, null, 2));
-        //create or get playlist in the database
         await createOrGetPlaylistId(playlist.id, playlist.name, playlist.tracks?.total || 0);
-        //get tracks from the playlist just made or fetched
+//get tracks from the playlist just made or fetched
         const tracks = await getAllTracksFromPlaylist(playlist.id);
-        // this is only for getting the first 5 playlists for demo purposes
         console.log("TRACKS: ", tracks);
+
         if (count > 5) {
           console.log("Stopping after 5 playlists for demo purposes.");
           break;
         }
+
         if (playlist.tracks.total > 0) {
           for (const track of tracks) {
             console.log(`Fetched ${track.name} tracks for playlist:`, playlist.name);
-            console.log(track);
-            //add song to songs table, and then add to playlist_songs table
             await addSong(track.id, track.name, track.artist);
             await addSongToPlaylist(playlist.id, track.id);
           }
         }
-        console.log(`Fetched '${tracks}' tracks for playlist:`, playlist.name);
         count++;
       }
     } catch (e: any) {
@@ -99,13 +92,21 @@ export default function AccountScreen() {
   };
 
   useEffect(() => {
-    loadDetails();
-    loadPlaylists();
+    const run = async () => {
+      console.log("AccountScreen: starting populate");
+      await initDb();
+      await loadDetails();
+      await loadPlaylists();
+      console.log("AccountScreen: done → tabs");
+      setLoading(false); //  stop loading
+      router.replace("/(tabs)");
+    };
+    run();
   }, []);
-  // console.log(user);
 
   const getAllTracksFromPlaylist = async (playlistId: string) => {
-    const token = await getToken();
+    const token = await getAccessToken();
+    if (!token) throw new Error("No access token found");
     const items: any[] = [];
     let url: string | null =
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`;
@@ -118,13 +119,29 @@ export default function AccountScreen() {
       }
     }
     return items
-    .map((it) => it.track)
-    .filter((t) => t && t.type === "track" && t.id)
+      .map((it) => it.track)
+      .filter((t) => t && t.type === "track" && t.id)
       .map((t) => ({
         id: t.id,
         name: t.name,
         artist: t?.artists?.[0]?.name ?? "Unknown",
       }));
+  };
+
+  // Loading screen
+  if (loading) {
+    return (
+      <LinearGradient
+        colors={['#1DB954', '#121212']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.loadingContainer}
+      >
+        <Text style={styles.loadingTitle}>Loading your account…</Text>
+        <Text style={styles.loadingSub}>Fetching Spotify data</Text>
+        <ActivityIndicator size="large" color="#fff" />
+      </LinearGradient>
+    );
   }
 
   return (
@@ -139,3 +156,25 @@ export default function AccountScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingTitle: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  loadingSub: {
+    color: "#E0E0E0",
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+});
