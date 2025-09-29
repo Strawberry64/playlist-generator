@@ -57,7 +57,7 @@ export default function AccountScreen() {
       setError(`User fetch failed: ${e.message}`);
     }
   };
-// this is the part that after loadings a playlist it will add it to playlist tables then to songs table
+  // this is the part that after loadings a playlist it will add it to playlist tables then to songs table
   const loadPlaylists = async () => {
     try {
       const token = await getToken();
@@ -73,7 +73,7 @@ export default function AccountScreen() {
         console.log(JSON.stringify(playlist, null, 2));
         //create or get playlist in the database
         await createOrGetPlaylistId(playlist.id, playlist.name, playlist.tracks?.total || 0);
-//get tracks from the playlist just made or fetched
+        //get tracks from the playlist just made or fetched
         const tracks = await getAllTracksFromPlaylist(playlist.id);
         // this is only for getting the first 5 playlists for demo purposes
         console.log("TRACKS: ", tracks);

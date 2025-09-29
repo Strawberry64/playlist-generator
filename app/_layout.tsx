@@ -22,6 +22,14 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="generate" 
+          options={{
+            title: "Generate Playlist",
+            headerStyle: { backgroundColor: "#1DB954" },
+            headerTintColor: "#fff",
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

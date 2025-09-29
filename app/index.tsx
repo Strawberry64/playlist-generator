@@ -36,7 +36,6 @@ const redirectUri = AuthSession.makeRedirectUri({
 
 const TOKENS_KEY = "spotify_tokens";
 
-
 export default function HomeScreen() {
 
   //iniciating tokens
@@ -165,7 +164,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
