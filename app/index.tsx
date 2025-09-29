@@ -1,19 +1,15 @@
 // import { Image } from 'expo-image';
-import { StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { saveTokens } from "../lib/auth";
 
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 // import { Text, View, TouchableOpacity, FlatList, Image} from "react-native";
-import { ResponseType, useAuthRequest, makeRedirectUri } from "expo-auth-session";
 import * as AuthSession from "expo-auth-session";
-//import { router } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ResponseType, useAuthRequest } from "expo-auth-session";
 
 const CLIENT_ID = process.env.EXPO_PUBLIC_CLIENT_ID;
 const CLIENT_SECRET = process.env.EXPO_PUBLIC_CLIENT_SECRET;
@@ -53,9 +49,11 @@ export default function HomeScreen() {
     usePKCE: false,
     redirectUri: redirectUri,
   }, discovery);
-   
+
   // Starts the auth flow
   const startAuth = async () => {
+
+    if (!request || isLoading) return;   // guard
     setIsLoading(true);
     console.log('Starting Spotify authentication');
     //runs hook
@@ -63,7 +61,7 @@ export default function HomeScreen() {
   };
 
   // function to exchange (code) from authorization to access token
-  const exchangeCodeForToken = async (code:string) => {
+  const exchangeCodeForToken = async (code: string) => {
     try {
       setIsLoading(true);
       const data = new URLSearchParams({
@@ -78,15 +76,16 @@ export default function HomeScreen() {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body:(data).toString(),
+        body: (data).toString(),
       });
       const tokenData = await response.json();
-      
+
       if (tokenData.access_token) {
         //sets tokens for universal use
-        await AsyncStorage.setItem(TOKENS_KEY, JSON.stringify(tokenData));
-        await AsyncStorage.setItem('access_token', tokenData.access_token);
-        await AsyncStorage.setItem('refresh_token', tokenData.refresh_token);
+        // await AsyncStorage.setItem(TOKENS_KEY, JSON.stringify(tokenData));
+        // await AsyncStorage.setItem('access_token', tokenData.access_token);
+        // await AsyncStorage.setItem('refresh_token', tokenData.refresh_token);
+        await saveTokens(tokenData);
 
         setAccessToken(tokenData.access_token);
         setRefreshToken(tokenData.refresh_token);
@@ -105,13 +104,6 @@ export default function HomeScreen() {
     }
   };
 
-  //  // Function to start authentication
-  // useEffect(() => {
-  //   if (!accessToken && request && !isLoading) {
-  //     console.log('Auto-starting authentication...');
-  //     startAuth();
-  //   }
-  // }, [request, accessToken]);
 
   // Handle authentication response
   useEffect(() => {
@@ -120,18 +112,18 @@ export default function HomeScreen() {
         const { code } = response.params;
         console.log('Authorization code received');
         await exchangeCodeForToken(code);
-        router.replace("/(tabs)")
+        router.replace("/account")
       } else if (response?.type === 'error') {
         console.error('Authorization error:', response.error);
         setIsLoading(false);
       }
     };
     handleAuthResponse();
-  }, [response]);  
+  }, [response]);
 
 
 
-  
+
   const router = useRouter();
   return (
     <LinearGradient
@@ -165,7 +157,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
