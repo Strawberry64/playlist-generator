@@ -22,8 +22,8 @@ describe("Database functions (async SQLite)", () => {
     jest.clearAllMocks();
   });
 
-  test("createSong should resolve without error", async () => {
-    await expect(createSong("Test Song", "Test Artist")).resolves.toBeDefined();
+  test("addSong should resolve without error", async () => {
+    await expect(addSong(0,"Test Song", "Test Artist")).resolves.toBeDefined();
   });
 
   test("createOrGetPlaylistId should return a number", async () => {
