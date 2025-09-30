@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Button,  TouchableOpacity, FlatList, Image, TextInput, Switch} from "react-native";
+import { Text, View, Button,  TouchableOpacity, FlatList, Image, TextInput, Switch, StyleSheet} from "react-native";
 import * as AuthSession from "expo-auth-session";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -76,34 +76,94 @@ export default function GeneratePage(){
         setIsCreating(false);
     }};
     
-    return(
-        <View>
-            <Text>Playlist Name</Text>
-            <TextInput
-                placeholder="Type name..."
-                value={name}
-                onChangeText={setName}
-            />
+    return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Create a Playlist</Text>
 
-            <Text>Description</Text>
-            <TextInput
-                placeholder="Type description..."
-                value={description}
-                onChangeText={setDescription}
-            />
+      <Text style={styles.label}>Playlist Name</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Type name..."
+        placeholderTextColor="#888"
+        value={name}
+        onChangeText={setName}
+      />
 
-            <Text>Search Track</Text>
-            <TextInput
-                placeholder="Track.."
-                value={track}
-                onChangeText={setTrack}></TextInput>
-            <Button 
-            title="try out search"
-            onPress={() => genParams(track)}></Button>
-            
-            <Button 
-            title={isCreating ? "Creating..." : "Create Plalist"} 
-            onPress={() => generate(name, description)}/>
-        </View>
-    );
+      <Text style={styles.label}>Description</Text>
+      <TextInput
+        style={[styles.input, { height: 80 }]}
+        placeholder="Type description..."
+        placeholderTextColor="#888"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+      />
+
+      <Text style={styles.label}>Search Track</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Track..."
+        placeholderTextColor="#888"
+        value={track}
+        onChangeText={setTrack}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={() => genParams(track)}>
+        <Text style={styles.buttonText}>Try Search</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, isCreating && { backgroundColor: "#333" }]}
+        onPress={() => generate(name, description)}
+        disabled={isCreating}
+      >
+        <Text style={styles.buttonText}>
+          {isCreating ? "Creating..." : "Create Playlist"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff", // Spotify dark
+    padding: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 14,
+    color: "#444",
+    marginBottom: 6,
+    marginTop: 16,
+  },
+  input: {
+    backgroundColor: "#f2f2f2",
+    color: "#000",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  button: {
+    backgroundColor: "#1DB954",
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
