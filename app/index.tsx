@@ -19,6 +19,7 @@ const SCOPES = [
   "user-library-modify", "user-library-read",
   "playlist-read-private", "playlist-read-collaborative",
   "playlist-modify-private", "playlist-modify-public",
+  "user-top-read",
 ];
 
 const discovery = {

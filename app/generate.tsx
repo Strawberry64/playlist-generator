@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { StatusBar, Text, View, Button,  TouchableOpacity, FlatList, TextInput, StyleSheet} from "react-native";
+import { StatusBar, Text, Alert, Button,  TouchableOpacity, FlatList, TextInput, StyleSheet} from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import * as AuthSession from "expo-auth-session";
 import { router } from "expo-router";
@@ -72,8 +72,9 @@ export default function GeneratePage(){
                     uris
                 }),
             })
-            console.log(uris)
             const populatedata = await resplaylist.json()
+            Alert.alert("Success", "Playlist successfully created!");
+            router.replace("/explore")
             console.log('playlist populated:', populatedata)
         } catch {
             console.log("Yo generate no work:");
