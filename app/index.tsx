@@ -32,7 +32,6 @@ const redirectUri = AuthSession.makeRedirectUri({
 
 const TOKENS_KEY = "spotify_tokens";
 
-
 export default function HomeScreen() {
 
   //iniciating tokens
