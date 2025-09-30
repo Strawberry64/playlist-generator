@@ -1,8 +1,10 @@
 import {
-  createSong,
+  addSong,
   createOrGetPlaylistId,
   addSongToPlaylist,
-  retrieve,
+  getAllSongs,
+  getAllPlaylists,
+  getSongsForPlaylist,
 } from "./db.js";
 
 // Mock expo-sqlite async API so no real DB is used
@@ -22,23 +24,32 @@ describe("Database functions (async SQLite)", () => {
     jest.clearAllMocks();
   });
 
-  test("createSong should resolve without error", async () => {
-    await expect(createSong("Test Song", "Test Artist")).resolves.toBeDefined();
+  test("addSong should resolve without error", async () => {
+    await expect(addSong("1","Test Song", "Test Artist")).resolves.toBeDefined();
   });
 
-  test("createOrGetPlaylistId should return a number", async () => {
-    const pid = await createOrGetPlaylistId("MyPlaylist");
-    expect(typeof pid).toBe("text");
+  test("createOrGetPlaylistId should return a string", async () => {
+    const pid = await createOrGetPlaylistId("123","MyPlaylist",0);
+    expect(typeof pid).toBe("string");
   });
 
-  test("addSongToPlaylist should resolve truthy", async () => {
-    const pid = await createOrGetPlaylistId("Rock Classics");
-    const added = await addSongToPlaylist(pid, "Bohemian Rhapsody", "Queen");
-    expect(added).toBeTruthy();
+  test("addSongToPlaylist should resolve without error", async () => {
+    const pid = await createOrGetPlaylistId("123", "Rock Classics", 0);
+    await expect(addSongToPlaylist(pid, "456")).resolves.toBeUndefined();
   });
 
-  test("retrieve should return an array or object", async () => {
-    const data = await retrieve();
-    expect(Array.isArray(data) || typeof data === "object").toBe(true);
+  test("getAllSongs should return an array", async () => {
+    const data = await getAllSongs();
+    expect(Array.isArray(data)).toBe(true);
+  });
+
+  test("getAllPlaylists should return an array", async () => {
+    const playlists = await getAllPlaylists();
+    expect(Array.isArray(playlists)).toBe(true);
+  });
+
+  test("getSongsForPlaylist should return an array", async () => {
+    const songs = await getSongsForPlaylist("123");
+    expect(Array.isArray(songs)).toBe(true);
   });
 });

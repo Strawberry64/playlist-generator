@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Button, StyleSheet, TextInput, View } from 'react-native';
+import { Button, StyleSheet, TextInput, View, TouchableOpacity, Text} from 'react-native';
 import React, { useState } from 'react';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -14,69 +14,80 @@ export default function DatabaseScreen() {
 
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
+  <ParallaxScrollView
+    headerBackgroundColor={{ light: "#121212", dark: "#121212" }}
+    style={{ flex: 1, backgroundColor: "#121212" }}
+    >
+    <ThemedView style={{ flex: 1, backgroundColor: "#121212" }}>
+      <ThemedText type="title" style={styles.title}>Database</ThemedText>
+    </ThemedView>
 
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Database</ThemedText>
-      </ThemedView>
+    {/* Action Buttons */}
+    <View style={styles.buttonGroup}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async () => {
+          await initDb();
+          console.log("SONGS: ", await getAllSongs());
+        }}
+      >
+        <Text style={styles.buttonText}>Get Songs</Text>
+      </TouchableOpacity>
 
-      <ThemedView>
-
-        <Button
-          onPress={async () => {
-            // await createSong(song, artist);
-            await initDb();
-
-            console.log('SONGS: ',await getAllSongs());
-          }}
-          title="Get Song"
-        />
-
-        <View style={{ marginVertical: 6 }} />
-
-        <Button
-          onPress={async () => {
-            // await createOrGetPlaylistId(playlistName); 
-            await initDb();
-
-            console.log("Playlist:",await getAllPlaylists());
-          }}
-          title="Get Playlist"
-        />
-
-        <View style={{ marginVertical: 6 }} />
-
-
-
-
-      </ThemedView>
-
-    </ParallaxScrollView>
-  );
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async () => {
+          await initDb();
+          console.log("Playlists:", await getAllPlaylists());
+        }}
+      >
+        <Text style={styles.buttonText}>Get Playlists</Text>
+      </TouchableOpacity>
+    </View>
+  </ParallaxScrollView>
+);
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    marginTop: 20,
+    marginBottom: 10,
+    alignItems: "center",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff", // white for Spotify dark
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  buttonGroup: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+    gap: 16,
+    backgroundColor: "#121212", // 👈 dark background for the whole section
+  paddingVertical: 20,
+  borderRadius: 10,
+  },
+  button: {
+    backgroundColor: "#1DB954", // Spotify green
+    paddingVertical: 16,
+    borderRadius: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  logo: {
+    height: 120,
+    width: 120,
+    position: "absolute",
+    bottom: 10,
+    left: "40%",
   },
 });
