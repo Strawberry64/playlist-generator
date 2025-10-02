@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as AuthSession from "expo-auth-session";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from '@react-native-picker/picker';
+//import { Picker } from '@react-native-picker/picker';
 
 export default function GeneratePage(){
     const [isCreating, setIsCreating] = useState(false);
@@ -102,6 +102,7 @@ export default function GeneratePage(){
             setResults([]);
         }
     }, [trackSearch, artistSearch]);
+
 
     return (
         <>

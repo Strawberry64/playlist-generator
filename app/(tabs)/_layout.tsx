@@ -33,34 +33,39 @@ export default function TabLayout() {
  // if (!checked) return null;
 
   return (
-    <Tabs
+     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          backgroundColor: "#121212", // Spotify dark background
+          borderTopWidth: 0,          // remove default border
+          height: 70,
+        },
+        tabBarActiveTintColor: "#1DB954", // Spotify green
+        tabBarInactiveTintColor: "#B3B3B3", // gray inactive
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Account',
+          tabBarIcon: ({ color }) => <FontAwesome5 name="user-circle" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'playlists',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Playlists',
+          tabBarIcon: ({ color }) =>  <FontAwesome5 name="list" size={24} color={color} />,
         }}
       />
+      
+      
       <Tabs.Screen
         name="stats"
         options={{
