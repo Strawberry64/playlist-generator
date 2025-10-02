@@ -9,10 +9,10 @@ export async function initDb() {
   ready = (async () => {
     db = await SQLite.openDatabaseAsync('test');
 
-    // db.execAsync("DROP TABLE IF EXISTS playlist_songs;");
-    // db.execAsync("DROP TABLE IF EXISTS songs;");  
-    // db.execAsync("DROP TABLE IF EXISTS playlists;");
-    // console.log('DELETING TABles');
+    db.execAsync("DROP TABLE IF EXISTS playlist_songs;");
+    db.execAsync("DROP TABLE IF EXISTS songs;");  
+    db.execAsync("DROP TABLE IF EXISTS playlists;");
+    console.log('DELETING TABles');
 
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS playlists (

@@ -67,10 +67,11 @@ export default function AccountScreen() {
       setPlaylists(Array.isArray(data.items) ? data.items : []);
       let count = 0;
       for (const playlist of data.items) {
+        console.log(playlist)
         await createOrGetPlaylistId(playlist.id, playlist.name, playlist.tracks?.total || 0);
 //get tracks from the playlist just made or fetched
         const tracks = await getAllTracksFromPlaylist(playlist.id);
-        console.log("TRACKS: ", tracks);
+        // console.log("TRACKS: ", tracks);
 
         if (count > 5) {
           console.log("Stopping after 5 playlists for demo purposes.");
@@ -79,7 +80,7 @@ export default function AccountScreen() {
 
         if (playlist.tracks.total > 0) {
           for (const track of tracks) {
-            console.log(`Fetched ${track.name} tracks for playlist:`, playlist.name);
+            // console.log(`Fetched ${track.name} tracks for playlist:`, playlist.name);
             await addSong(track.id, track.name, track.artist);
             await addSongToPlaylist(playlist.id, track.id);
           }
@@ -94,6 +95,7 @@ export default function AccountScreen() {
   useEffect(() => {
     const run = async () => {
       console.log("AccountScreen: starting populate");
+      
       await initDb();
       await loadDetails();
       await loadPlaylists();
